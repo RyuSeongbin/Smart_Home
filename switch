@@ -1,0 +1,64 @@
+Topic : 
+　　We intend to use Raspberry pi to build SDN network to achieve the data exchange between nodes and controller, and now the idea is to use a Raspberry pi to install the switch software for achieve the function of switch, another Raspberry pi will install controller software to achieve control function. And then two Raspberries pi be connected to achieve control the nodes in SND network.
+　　Our group have four people, so we divided the theme into two parts, one part is the installation of controller, another part is the installation of switch. I am responsible for the switch installation section.
+　　Switch section need to install the LINC switch and Erlang.
+　　
+　　
+LINC switch and Erlang:
+　　LINC is a pure OpenFlow software switch written in Erlang. It’s implemented in operating system’s userspace as an Erlang node. Such approach is not the most efficient one, but it gives a lot of flexibility and allows quick development and testing of new OpenFlow features.
+　　Erlang  is a general-purpose, concurrent, functional programming language, as well as a garbage-collected runtime system. The term Erlang is used interchangeably with Erlang/OTP, or OTP, which consists of the Erlang runtime system, a number of ready-to-use components mainly written in Erlang, and a set of design principles for Erlang programs.
+
+Why LINC?
+It provides full support for the Openflow feature, which facilitates in-depth understanding of the principles and details of Openflow.
+
+2. In the Erlang support, to achieve the full use of multi-core processors, in the standard hardware to get better processing performance. At the same time there is a high degree of fault tolerance.
+
+LINC architecture diagram:
+
+Installation process:
+　　Here is my installation process, I have used the Ubuntu 17.04 system in my PC to instead of Raspberry pi, because the same is both used the Liunx system.
+　　
+1. Install the Erlang environment:
+root@workgroup3:~# apt-get install erlang
+
+2. Enter the Erlang shell check version information:
+root@workgroup3:~# erl
+Erlang R16B03 (erts-5.10.4) [source] [64-bit] [async-threads:10] [kernel-poll:false]
+Eshell V5.10.4  (abort with ^G)
+1> 
+
+Clone a piece of LINC code:
+root@workgroup3:~# git clone https://github.com/FlowForwarding/LINC-Switch.git
+root@workgroup3:~# cd LINC-Switch/
+root@workgroup3:~/LINC-Switch# 
+
+Install other tools for building LINC:
+root@workgroup3:~/LINC-Switch# apt-get install git-core bridge-utils libpcap0.8 libpcap-dev libcap2-bin uml-utilities
+
+5. Rename sys.config.orig to sys.config
+root@workgroup3:~/LINC-Switch# ls
+apps  docs  LICENSE  Makefile  pcap.data  README.md  rebar  rebar.config  rel  scripts
+root@workgroup3:~/LINC-Switch# cd rel/files/ 
+root@workgroup3:~/LINC-Switch/rel/files# ls
+erl  linc  nodetool  sys.config.orig  vm.args
+root@workgroup3:~/LINC-Switch/rel/files# mv sys.config.orig sys.config
+
+6.Compile LINC：
+root@workgroup3:~/LINC-Switch# make
+
+Initiate LINC for the first time and enter console mode:
+root@workgroup3:~/LINC-Switch# rel/linc/bin/linc console
+Exec: /root/LINC-Switch/rel/linc/erts-5.10.4/bin/erlexec -boot /root/LINC-Switch/rel/linc/releases/1.0/linc -mode embedded -config /root/LINC-Switch/rel/linc/releases/1.0/sys.config -args_file /root/LINC-Switch/rel/linc/releases/1.0/vm.args -- console
+Root: /root/LINC-Switch/rel/linc
+Erlang R16B03 (erts-5.10.4) [source] [64-bit] [async-threads:10] [kernel-poll:false]
+
+load_driver 'netlink_drv' from: '/root/LINC-Switch/rel/linc/lib/netlink-1/priv'
+10:15:10.508 [info] Application lager started on node linc@workgroup3
+10:15:10.508 [info] Application ssh started on node linc@workgroup3
+10:15:10.511 [info] Application enetconf started on node linc@workgroup3
+10:15:10.515 [info] Application linc started on node linc@workgroup3
+Eshell V5.10.4  (abort with ^G)
+(linc@workgroup3)1> 
+
+
+This allows you to operate LINC with the help of the Erlang shell.
